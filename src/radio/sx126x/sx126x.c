@@ -29,6 +29,7 @@
 #include "sx126x-board.h"
 
 static uint8_t paDutyCycle = 4;
+static uint8_t hpMax = 7;
 
 /*!
  * \brief Internal frequency of the radio
@@ -79,9 +80,10 @@ volatile uint32_t FrequencyError = 0;
  */
 static bool ImageCalibrated = false;
 
-void SetPaDutyCycle(uint8_t dc)
+void SetPaDutyCycle(uint8_t dc, uint8_t hp)
 {
    paDutyCycle = dc;
+   hpMax = hp;
 }
 
 /*!
@@ -286,6 +288,7 @@ void SX126xSetStandby( RadioStandbyModes_t standbyConfig )
     {
         SX126xSetOperatingMode( MODE_STDBY_XOSC );
     }
+    DelayMs( 2 );
 }
 
 void SX126xSetFs( void )
@@ -535,7 +538,6 @@ RadioPacketTypes_t SX126xGetPacketType( void )
 void SX126xSetTxParams( int8_t power, RadioRampTimes_t rampTime )
 {
     uint8_t buf[2];
-    uint8_t hpMax = 7;
 
     if( SX126xGetDeviceId( ) == SX1261 )
     {
@@ -562,18 +564,6 @@ void SX126xSetTxParams( int8_t power, RadioRampTimes_t rampTime )
         SX126xWriteRegister( REG_TX_CLAMP_CFG, SX126xReadRegister( REG_TX_CLAMP_CFG ) | ( 0x0F << 1 ) );
         // WORKAROUND END
 
-        if (paDutyCycle == 2)
-        {
-           hpMax = 3;
-        }
-        else if (paDutyCycle == 3)
-        {
-           hpMax = 5;
-        }
-        else
-        {
-           hpMax = 7;
-        }
         SX126xSetPaConfig( paDutyCycle, hpMax, 0x00, 0x01 );
         if( power > 22 )
         {
