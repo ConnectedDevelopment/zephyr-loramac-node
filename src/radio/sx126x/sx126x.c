@@ -288,6 +288,8 @@ void SX126xSetStandby( RadioStandbyModes_t standbyConfig )
     {
         SX126xSetOperatingMode( MODE_STDBY_XOSC );
     }
+
+    // Added to get JOINs and data Tx to work.
     DelayMs( 2 );
 }
 
@@ -508,6 +510,11 @@ void SX126xSetRfFrequency( uint32_t frequency )
 {
     uint8_t buf[4];
 
+    if (SX126xGetOperatingMode() != MODE_STDBY_RC)
+    {
+        SX126xSetStandby( STDBY_RC );
+    }
+
     if( ImageCalibrated == false )
     {
         SX126xCalibrateImage( frequency );
@@ -527,6 +534,13 @@ void SX126xSetPacketType( RadioPacketTypes_t packetType )
 {
     // Save packet type internally to avoid questioning the radio
     PacketType = packetType;
+
+    // Setting modem type must happen in standby mode.
+    if (SX126xGetOperatingMode() != MODE_STDBY_RC)
+    {
+        SX126xSetStandby( STDBY_RC );
+    }
+
     SX126xWriteCommand( RADIO_SET_PACKETTYPE, ( uint8_t* )&packetType, 1 );
 }
 
