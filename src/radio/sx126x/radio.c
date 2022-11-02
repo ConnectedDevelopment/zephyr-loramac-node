@@ -523,7 +523,7 @@ void RadioInit( RadioEvents_t *events )
 
     SX126xInit( RadioOnDioIrq );
     SX126xSetStandby( STDBY_RC );
-    SX126xSetRegulatorMode( USE_LDO );
+    SX126xSetRegulatorMode( USE_DCDC );
 
     SX126xSetBufferBaseAddress( 0x00, 0x00 );
     SX126xSetTxParams( 0, RADIO_RAMP_200_US );
